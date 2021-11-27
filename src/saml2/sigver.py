@@ -12,7 +12,7 @@ import six
 import sys
 from uuid import uuid4 as gen_random_key
 from time import mktime
-from tempfile import NamedTemporaryFile
+from tempfile import NamedTemporaryFile, gettempdir
 from subprocess import Popen
 from subprocess import PIPE
 
@@ -368,11 +368,18 @@ def make_temp(content, suffix="", decode=True, delete_tmpfiles=True):
         content.encode("utf-8") if not isinstance(content, six.binary_type) else content
     )
     content_raw = base64.b64decode(content_encoded) if decode else content_encoded
-    ntf = NamedTemporaryFile(suffix=suffix, delete=delete_tmpfiles)
+    ntf = _make_temp(suffix=suffix, delete_tmpfiles=delete_tmpfiles)
     ntf.write(content_raw)
     ntf.seek(0)
     return ntf
 
+def _make_temp(suffix="", delete_tmpfiles=True):
+    # `NamedTemporaryFile` is not very reliable on Windows, so we'll make a
+    # tempfile a different way.
+    if sys.platform == 'win32':
+        return open(os.path.join(gettempdir(), '%s.%s' % (uuid4(), suffix)), 'w+b')
+    else:
+            return NamedTemporaryFile(suffix=suffix, delete=delete_tmpfiles)
 
 def split_len(seq, length):
     return [seq[i:i + length] for i in range(0, len(seq), length)]
@@ -912,7 +919,7 @@ class CryptoBackendXmlSec1(CryptoBackend):
             key-value parameters
         :result: Whatever xmlsec wrote to an --output temporary file
         """
-        with NamedTemporaryFile(suffix='.xml') as ntf:
+        with _make_temp(suffix='.xml') as ntf:
             com_list.extend(['--output', ntf.name])
             com_list += extra_args
 
