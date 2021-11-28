@@ -4,6 +4,7 @@ from saml2 import time_util
 from saml2 import BINDING_HTTP_REDIRECT
 from saml2.attribute_converter import to_local
 from saml2.s_utils import OtherError
+from saml2.s_utils import VersionMismatch
 
 from saml2.validate import valid_instance
 from saml2.validate import NotValid
