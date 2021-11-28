@@ -377,9 +377,9 @@ def _make_temp(suffix="", delete_tmpfiles=True):
     # `NamedTemporaryFile` is not very reliable on Windows, so we'll make a
     # tempfile a different way.
     if sys.platform == 'win32':
-        return open(os.path.join(gettempdir(), '%s.%s' % (uuid4(), suffix)), 'w+b')
+        return open(os.path.join(gettempdir(), '%s.%s' % (gen_random_key(), suffix)), 'w+b')
     else:
-            return NamedTemporaryFile(suffix=suffix, delete=delete_tmpfiles)
+        return NamedTemporaryFile(suffix=suffix, delete=delete_tmpfiles)
 
 def split_len(seq, length):
     return [seq[i:i + length] for i in range(0, len(seq), length)]
