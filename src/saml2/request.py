@@ -137,7 +137,7 @@ class Request(object):
             )
 
         if self.message.destination and self.receiver_addrs and \
-                self.message.destination not in self.receiver_addrs:
+                self.message.destination.rstrip("/") not in self.receiver_addrs.rstrip("/"):
             logger.error("%s not in %s", self.message.destination, self.receiver_addrs)
             raise OtherError("Not destined for me!")
 
